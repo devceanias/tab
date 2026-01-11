@@ -23,6 +23,7 @@ public class LayoutPattern extends RefreshableFeature implements Layout {
     @NotNull private final String name;
     @Nullable private final Condition condition;
     private final int slotCount;
+    private final boolean dynamicColumns;
     @Nullable private final String defaultSkinOverride;
     @Nullable private final TabList.Skin defaultSkin;
     private final Map<Integer, FixedSlot> fixedSlots = new HashMap<>();
@@ -34,6 +35,7 @@ public class LayoutPattern extends RefreshableFeature implements Layout {
         condition = TAB.getInstance().getPlaceholderManager().getConditionManager().getByNameOrExpression(def.getCondition());
         if (condition != null) manager.addUsedPlaceholder(condition.getPlaceholderIdentifier());
         slotCount = def.getSlotCount();
+        dynamicColumns = def.isDynamicColumns();
         defaultSkinOverride = def.getDefaultSkin();
         defaultSkin = def.getDefaultSkin() == null ? null : manager.getSkinManager().getSkin(def.getDefaultSkin());
         for (FixedSlotPattern fixed : def.getFixedSlots()) {
@@ -124,7 +126,7 @@ public class LayoutPattern extends RefreshableFeature implements Layout {
     public void addFixedSlot(int slot, @NonNull String text, @NonNull String skin, int ping) {
         ensureActive();
         if (slot < 1 || slot > slotCount) throw new IllegalArgumentException("Slot must be between 1 - " + slotCount + " (was " + slot + ")");
-        fixedSlots.put(slot, new FixedSlot(manager, slot, this, manager.getUUID(slot), text, skin, null, ping));
+        fixedSlots.put(slot, new FixedSlot(manager, slot, this, text, skin, null, ping));
     }
 
     @Override

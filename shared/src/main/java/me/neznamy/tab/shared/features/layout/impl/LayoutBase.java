@@ -9,6 +9,8 @@ import me.neznamy.tab.shared.platform.TabPlayer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.UUID;
+
 /**
  * Base class for all layout implementations.
  */
@@ -49,6 +51,49 @@ public abstract class LayoutBase {
      */
     @Nullable
     public abstract PlayerSlot getSlot(@NotNull TabPlayer target);
+
+    /**
+     * Translates configured slot to rendered slot.
+     *
+     * @param   slot
+     *          Configured slot
+     * @return  Rendered slot
+     */
+    public int mapSlot(final int slot) {
+        return slot;
+    }
+
+    /**
+     * Returns whether a configured slot should be visible.
+     *
+     * @param   slot
+     *          Configured slot
+     * @return  {@code true} if slot should be visible
+     */
+    public boolean isVisible(final int slot) {
+        return true;
+    }
+
+    /**
+     * Returns UUID for rendered slot.
+     *
+     * @param   slot
+     *          Configured slot
+     * @return  UUID for rendered slot
+     */
+    @NotNull
+    public UUID getUuid(final int slot) {
+        return manager.getUUID(mapSlot(slot));
+    }
+
+    /**
+     * Returns whether empty player slots should be sent.
+     *
+     * @return  {@code true} if empty slots should be sent
+     */
+    public boolean shouldSendEmptyPlayers() {
+        return true;
+    }
 
     /**
      * Processes player join.

@@ -19,7 +19,7 @@ public class PlayerSlot {
 
     private static final StringToComponentCache cache = new StringToComponentCache("LayoutPlayerSlot", 100);
 
-    private final int slot;
+    @Getter private final int slot;
     private final LayoutBase layout;
     @Getter private final UUID uniqueId;
     @Getter private TabPlayer player;
@@ -71,7 +71,19 @@ public class PlayerSlot {
         if (player != null) {
             setPlayer(null);
         } else {
-            layout.getViewer().getTabList().updateDisplayName(uniqueId, cache.get(text));
+            final TabList tablist = layout.getViewer().getTabList();
+
+            if (!layout.shouldSendEmptyPlayers()) {
+                tablist.removeEntry(uniqueId);
+
+                if (!text.isEmpty()) {
+                    tablist.addEntry(getSlot(layout.getViewer()));
+                }
+
+                return;
+            }
+
+            tablist.updateDisplayName(uniqueId, cache.get(text));
         }
     }
 }

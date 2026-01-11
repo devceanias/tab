@@ -128,6 +128,7 @@ layout:
   layouts:
     default:
       slot-count: 80
+      dynamic-columns: false
       fixed-slots:
         - '1|&3Website&f:'
         - '2|&bmyserver.net'

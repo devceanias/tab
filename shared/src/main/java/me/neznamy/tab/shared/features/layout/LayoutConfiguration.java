@@ -135,6 +135,7 @@ public class LayoutConfiguration {
         @Nullable private final String condition;
         @Nullable private final String defaultSkin;
         private final int slotCount;
+        private final boolean dynamicColumns;
         @NotNull private final List<FixedSlotPattern> fixedSlots;
         @NotNull private final LinkedHashMap<String, GroupPattern> groups;
 
@@ -150,7 +151,7 @@ public class LayoutConfiguration {
          */
         public static LayoutDefinition fromSection(@NotNull String name, @NotNull ConfigurationSection section) {
             // Check keys
-            section.checkForUnknownKey(Arrays.asList("display-condition", "default-skin", "slot-count", "fixed-slots", "groups"));
+            section.checkForUnknownKey(Arrays.asList("display-condition", "default-skin", "slot-count", "dynamic-columns", "fixed-slots", "groups"));
 
             // Slot count
             Integer slotCount = section.getInt("slot-count");
@@ -159,6 +160,8 @@ public class LayoutConfiguration {
                 section.startupWarn("Layout \"" + name + "\" has invalid slot-count value \"" + slotCount + "\" defined. Slot count must range between 0 - 80. Using 80.");
                 slotCount = 80;
             }
+
+            final boolean dynamicColumns = section.getBoolean("dynamic-columns", false);
 
             // Fixed slots
             List<FixedSlotPattern> fixedSlots = new ArrayList<>();
@@ -202,6 +205,7 @@ public class LayoutConfiguration {
                     section.getString("display-condition"),
                     section.getString("default-skin"),
                     slotCount,
+                    dynamicColumns,
                     fixedSlots,
                     groups
             );

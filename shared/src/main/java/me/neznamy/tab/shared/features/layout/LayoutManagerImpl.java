@@ -169,6 +169,21 @@ public class LayoutManagerImpl extends RefreshableFeature implements LayoutManag
         }
     }
 
+    public void rebuildPlayerLayout(@NotNull final TabPlayer player) {
+        final LayoutData layout = player.layoutData.currentLayout;
+
+        if (layout == null) {
+            return;
+        }
+
+        final LayoutBase view = layout.view;
+        final LayoutPattern pattern = view.getPattern();
+
+        view.destroy();
+
+        sendLayout(player, pattern);
+    }
+
     // ------------------
     // API Implementation
     // ------------------
@@ -177,7 +192,7 @@ public class LayoutManagerImpl extends RefreshableFeature implements LayoutManag
     @NotNull
     public Layout createNewLayout(@NonNull String name) {
         ensureActive();
-        return new LayoutPattern(this, new LayoutDefinition(name, null, null, 80, Collections.emptyList(), new LinkedHashMap<>()));
+        return new LayoutPattern(this, new LayoutDefinition(name, null, null, 80, false, Collections.emptyList(), new LinkedHashMap<>()));
     }
 
     @Override

@@ -7,6 +7,7 @@ import me.neznamy.tab.shared.Property;
 import me.neznamy.tab.shared.TAB;
 import me.neznamy.tab.shared.TabConstants;
 import me.neznamy.tab.shared.features.layout.LayoutManagerImpl;
+import me.neznamy.tab.shared.features.layout.impl.LayoutBase;
 import me.neznamy.tab.shared.features.layout.pattern.FixedSlotPattern;
 import me.neznamy.tab.shared.features.layout.pattern.LayoutPattern;
 import me.neznamy.tab.shared.features.types.RefreshableFeature;
@@ -17,7 +18,9 @@ import me.neznamy.tab.shared.util.cache.StringToComponentCache;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.UUID;
+
 
 /**
  * A fixed layout slot with defined slot, text and maybe also ping and skin.
@@ -30,7 +33,6 @@ public class FixedSlot extends RefreshableFeature {
     @NonNull private final LayoutManagerImpl manager;
     @Getter private final int slot;
     @NonNull private final LayoutPattern pattern;
-    @NonNull private final UUID id;
     @NonNull private final String text;
     @NonNull private final String skin;
     @Nullable private final String pingText;
@@ -51,17 +53,26 @@ public class FixedSlot extends RefreshableFeature {
     @Override
     public void refresh(@NotNull TabPlayer p, boolean force) {
         if (p.layoutData.currentLayout == null || p.layoutData.currentLayout.view.getPattern() != pattern) return;
+
+        final LayoutBase view = p.layoutData.currentLayout.view;
+
+        if (!view.isVisible(slot)) {
+            return;
+        }
+
+        final UUID uuid = view.getUuid(slot);
+
         if (p.layoutData.currentLayout.fixedSlotSkins.get(this).update()) {
-            p.getTabList().removeEntry(id);
+            p.getTabList().removeEntry(uuid);
             p.getTabList().addEntry(createEntry(p));
             return;
         }
         if (p.layoutData.currentLayout.fixedSlotTexts.get(this).update()) {
-            p.getTabList().updateDisplayName(id, cache.get(p.layoutData.currentLayout.fixedSlotTexts.get(this).get()));
+            p.getTabList().updateDisplayName(uuid, cache.get(p.layoutData.currentLayout.fixedSlotTexts.get(this).get()));
         }
         Property pingProperty = p.layoutData.currentLayout.fixedSlotPings.get(this);
         if (pingProperty != null && pingProperty.update()) {
-            p.getTabList().updateLatency(id, parsePing(pingProperty.get(), p));
+            p.getTabList().updateLatency(uuid, parsePing(pingProperty.get(), p));
         }
     }
 
@@ -74,6 +85,8 @@ public class FixedSlot extends RefreshableFeature {
      */
     @NotNull
     public TabList.Entry createEntry(@NotNull TabPlayer viewer) {
+        final LayoutBase view = Objects.requireNonNull(viewer.layoutData.currentLayout).view;
+
         viewer.layoutData.currentLayout.fixedSlotTexts.put(this, new Property(this, viewer, text));
         viewer.layoutData.currentLayout.fixedSlotSkins.put(this, new Property(this, viewer, skin));
         int ping = defaultPing;
@@ -82,15 +95,18 @@ public class FixedSlot extends RefreshableFeature {
             viewer.layoutData.currentLayout.fixedSlotPings.put(this, pingProperty);
             ping = parsePing(pingProperty.updateAndGet(), viewer);
         }
+
+        final int mapped = view.mapSlot(slot);
+
         return new TabList.Entry(
-                id,
-                manager.getConfiguration().getDirection().getEntryName(viewer, slot, LayoutManagerImpl.isTeamsEnabled()),
+                view.getUuid(slot),
+                manager.getConfiguration().getDirection().getEntryName(viewer, mapped, LayoutManagerImpl.isTeamsEnabled()),
                 manager.getSkinManager().getSkin(viewer.layoutData.currentLayout.fixedSlotSkins.get(this).updateAndGet()),
                 true,
                 ping,
                 0,
                 cache.get(viewer.layoutData.currentLayout.fixedSlotTexts.get(this).updateAndGet()),
-                Integer.MAX_VALUE - manager.getConfiguration().getDirection().translateSlot(slot),
+                Integer.MAX_VALUE - manager.getConfiguration().getDirection().translateSlot(mapped),
                 true
         );
     }
@@ -120,7 +136,6 @@ public class FixedSlot extends RefreshableFeature {
                 manager,
                 def.getSlot(),
                 pattern,
-                manager.getUUID(def.getSlot()),
                 def.getText(),
                 skin,
                 def.getPing(),

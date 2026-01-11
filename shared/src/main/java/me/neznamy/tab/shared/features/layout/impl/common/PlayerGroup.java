@@ -80,8 +80,12 @@ public class PlayerGroup {
      * Sends all player slots in this group to the viewer's tab list.
      */
     public void sendAll() {
-        for (PlayerSlot s : playerSlots.values()) {
-            layout.getViewer().getTabList().addEntry(s.getSlot(layout.getViewer()));
+        for (final PlayerSlot slot : playerSlots.values()) {
+            if (!layout.shouldSendEmptyPlayers() && slot.getPlayer() == null) {
+                continue;
+            }
+
+            layout.getViewer().getTabList().addEntry(slot.getSlot(layout.getViewer()));
         }
     }
 }
