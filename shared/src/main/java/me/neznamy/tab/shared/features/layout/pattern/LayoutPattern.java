@@ -42,8 +42,11 @@ public class LayoutPattern extends RefreshableFeature implements Layout {
             FixedSlot slot = FixedSlot.fromDefinition(fixed, this, manager);
             fixedSlots.put(slot.getSlot(), slot);
         }
-        for (Map.Entry<String, GroupPattern> entry : def.getGroups().entrySet()) {
-            addGroup(entry.getValue().getCondition(), entry.getValue().getSlots());
+
+        for (final Map.Entry<String, GroupPattern> entry : def.getGroups().entrySet()) {
+            final GroupPattern group = entry.getValue();
+
+            addGroup(group.getCondition(), group.getSlots(), group.isSpectator());
         }
     }
 
@@ -130,9 +133,19 @@ public class LayoutPattern extends RefreshableFeature implements Layout {
     }
 
     @Override
-    public void addGroup(@Nullable String condition, int[] slots) {
+    public void addGroup(@Nullable final String condition, final int[] slots) {
+        addGroup(condition, slots, false);
+    }
+
+    public void addGroup(@Nullable final String condition, final int[] slots, final boolean spectatorMode) {
         ensureActive();
-        groups.add(new GroupPattern(condition, Arrays.stream(slots).filter(slot -> !fixedSlots.containsKey(slot)).toArray()));
+
+        groups.add(new GroupPattern(
+            condition,
+            Arrays.stream(slots).filter(slot -> !fixedSlots.containsKey(slot)).toArray(),
+            spectatorMode
+        ));
+
         if (condition != null) {
             Condition compiled = TAB.getInstance().getPlaceholderManager().getConditionManager().getByNameOrExpression(condition);
             addUsedPlaceholder(compiled.getPlaceholderIdentifier());

@@ -215,7 +215,7 @@ public class LayoutConfiguration {
         private static GroupPattern groupFromSection(@NotNull ConfigurationSection section, @NotNull String layout,
                                                 @NotNull String groupName, int slotCount) {
             // Check keys
-            section.checkForUnknownKey(Arrays.asList("display-condition", "slots"));
+            section.checkForUnknownKey(Arrays.asList("display-condition", "slots", "spectator-mode"));
 
             List<Integer> positions = new ArrayList<>();
             for (String line : section.getStringList("slots", Collections.emptyList())) {
@@ -236,7 +236,8 @@ public class LayoutConfiguration {
             }
             return new GroupPattern(
                     section.getString("display-condition"),
-                    positions.stream().mapToInt(i->i).toArray()
+                    positions.stream().mapToInt(i->i).toArray(),
+                    section.getBoolean("spectator-mode", false)
             );
         }
 

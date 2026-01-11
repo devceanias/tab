@@ -19,4 +19,7 @@ public class GroupPattern {
 
     /** Slots to display players in */
     private final int[] slots;
+
+    /** Whether entries in this group should use spectator style */
+    private final boolean spectator;
 }

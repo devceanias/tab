@@ -23,6 +23,7 @@ public class PlayerGroup {
     @NotNull private final LayoutBase layout;
     @Nullable private final Condition condition;
     private final int[] slots;
+    private final boolean spectator;
     private final Map<Integer, PlayerSlot> playerSlots = new HashMap<>();
     private final Map<TabPlayer, PlayerSlot> players = new HashMap<>();
 
@@ -38,8 +39,9 @@ public class PlayerGroup {
         this.layout = layout;
         condition = TAB.getInstance().getPlaceholderManager().getConditionManager().getByNameOrExpression(pattern.getCondition());
         slots = pattern.getSlots();
+        spectator = pattern.isSpectator();
         for (int slot : slots) {
-            playerSlots.put(slot, new PlayerSlot(slot, layout, layout.getManager().getUUID(slot)));
+            playerSlots.put(slot, new PlayerSlot(slot, layout, layout.getManager().getUUID(slot), spectator));
         }
     }
 

@@ -131,7 +131,7 @@ public class FakeEntryLayout extends LayoutBase {
                 continue;
             }
 
-            groups.add(new PlayerGroup(this, new GroupPattern(group.getCondition(), mapped)));
+            groups.add(new PlayerGroup(this, new GroupPattern(group.getCondition(), mapped, group.isSpectator())));
         }
     }
 

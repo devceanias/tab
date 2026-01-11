@@ -22,6 +22,7 @@ public class PlayerSlot {
     @Getter private final int slot;
     private final LayoutBase layout;
     @Getter private final UUID uniqueId;
+    private final boolean spectator;
     @Getter private TabPlayer player;
     private String text = "";
 
@@ -49,7 +50,7 @@ public class PlayerSlot {
                     player.getTabList().getSkin(),
                     true,
                     layout.getManager().getPingSpoof() != null ? layout.getManager().getPingSpoof().getConfiguration().getValue() : player.getPing(),
-                    0,
+                    spectator ? 3 : player.getGamemode(),
                     playerList == null || player.tablistData.disabled.get() ? TabComponent.legacyText(player.getName()) : playerList.getTabFormat(player, viewer),
                     Integer.MAX_VALUE - layout.getManager().getConfiguration().getDirection().translateSlot(slot),
                     true
