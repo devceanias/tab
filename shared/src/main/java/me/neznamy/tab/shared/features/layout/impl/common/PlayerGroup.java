@@ -81,7 +81,7 @@ public class PlayerGroup {
      */
     public void sendAll() {
         for (final PlayerSlot slot : playerSlots.values()) {
-            if (!layout.shouldSendEmptyPlayers() && slot.getPlayer() == null) {
+            if (slot.isEmpty() && !layout.shouldSendEmptySlot(slot.getSlot())) {
                 continue;
             }
 

@@ -30,6 +30,11 @@ public class PlayerSlot {
         player = newPlayer;
         if (player != null) text = "";
         layout.getViewer().getTabList().removeEntry(uniqueId);
+
+        if (player == null && text.isEmpty() && !layout.shouldSendEmptySlot(slot)) {
+            return;
+        }
+
         layout.getViewer().getTabList().addEntry(getSlot(layout.getViewer()));
     }
 
@@ -73,17 +78,17 @@ public class PlayerSlot {
         } else {
             final TabList tablist = layout.getViewer().getTabList();
 
-            if (!layout.shouldSendEmptyPlayers()) {
+            if (this.text.isEmpty() && !layout.shouldSendEmptySlot(slot)) {
                 tablist.removeEntry(uniqueId);
-
-                if (!text.isEmpty()) {
-                    tablist.addEntry(getSlot(layout.getViewer()));
-                }
 
                 return;
             }
 
             tablist.updateDisplayName(uniqueId, cache.get(text));
         }
+    }
+
+    public boolean isEmpty() {
+        return player == null && text.isEmpty();
     }
 }

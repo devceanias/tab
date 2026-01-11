@@ -47,6 +47,7 @@ public class FakeEntryLayout extends LayoutBase {
     private final int columnsCount;
     private final boolean[] activeColumns;
     private final int[] slotMapping;
+    private final boolean hasColumnAfterFirst;
 
     /**
      * Constructs new instance with given parameters.
@@ -89,12 +90,19 @@ public class FakeEntryLayout extends LayoutBase {
             Arrays.fill(activeColumns, true);
         }
 
+        final int activeCount = countActive(activeColumns);
+
+        hasColumnAfterFirst = activeCount > 1;
         slotMapping = buildMapping(activeColumns);
 
-        final int effectiveSlots = dynamicColumns ? countActive(activeColumns) * COLUMN_SIZE : slotCount;
+        final int effectiveSlots = dynamicColumns ? activeCount * COLUMN_SIZE : slotCount;
         final Collection<FixedSlot> visibleFixed = new ArrayList<>();
 
-        emptySlots = IntStream.range(1, effectiveSlots + 1).boxed().collect(Collectors.toList());
+        emptySlots = IntStream.range(1, effectiveSlots + 1)
+            .filter(this::shouldSendEmptySlot)
+            .boxed()
+            .collect(Collectors.toList());
+
         allUUIDs = Arrays.copyOf(manager.getUuids(), effectiveSlots);
 
         for (final FixedSlot slot : pattern.getFixedSlots().values()) {
@@ -215,8 +223,18 @@ public class FakeEntryLayout extends LayoutBase {
     }
 
     @Override
-    public boolean shouldSendEmptyPlayers() {
-        return !dynamicColumns;
+    public boolean shouldSendEmptySlot(final int slot) {
+        if (!dynamicColumns) {
+            return true;
+        }
+
+        if (slot <= 0) {
+            return false;
+        }
+
+        final int column = (slot - 1) / COLUMN_SIZE;
+
+        return column > 0 || hasColumnAfterFirst;
     }
 
     private void removeEmpty(final int slot) {

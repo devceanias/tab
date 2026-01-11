@@ -96,6 +96,17 @@ public abstract class LayoutBase {
     }
 
     /**
+     * Returns whether an empty player slot should be sent for the given slot.
+     *
+     * @param   slot
+     *          Slot to check
+     * @return  {@code true} if empty slot should be sent
+     */
+    public boolean shouldSendEmptySlot(final int slot) {
+        return shouldSendEmptyPlayers();
+    }
+
+    /**
      * Processes player join.
      *
      * @param   player
